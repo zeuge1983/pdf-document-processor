@@ -40,8 +40,8 @@ A Python console application that processes PDF documents using Llama Index, Chr
      ```
    - **IMPORTANT**: Make sure to use a valid API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
    - The API key should have access to the following Gemini models:
-     - `models/embedding-001` (for embeddings)
-     - `models/gemini-pro` (for text generation)
+     - `models/text-embedding-004` (for embeddings)
+     - `models/gemini-1.5-pro-001` (for text generation)
    - If you encounter API key errors, verify that:
      - The key is correctly copied without any extra spaces
      - The key is active and has not expired
@@ -155,15 +155,28 @@ If you encounter errors related to the API key:
    - Ensure that ChromaDB is properly installed
    - Check for any firewall or permission issues
 
-### Running the Test Script
+### Running the Test Scripts
 
-To verify that your environment is set up correctly, run the test script:
+To verify that your environment is set up correctly, run the test scripts:
 
-```bash
-python test_env.py
-```
+1. Test environment variables:
+   ```bash
+   python test_env.py
+   ```
+   This will check if your API key is properly set in the environment.
 
-This will check if your API key is valid and can access the Gemini API.
+2. Test Gemini API models:
+   ```bash
+   python test_gemini.py
+   ```
+   This will verify that your API key can access the required Gemini models:
+   - `models/text-embedding-004` for embeddings
+   - `models/gemini-1.5-pro-001` for text generation
+
+If you encounter any errors with the test scripts, make sure:
+- Your API key is correctly set in the `.env` file
+- Your API key has access to the required models
+- You have sufficient quota for the Gemini API
 
 ## Contributing
 
