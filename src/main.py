@@ -56,6 +56,10 @@ class CustomGeminiEmbedding(BaseEmbedding):
             logger.error(f"Error getting query embedding: {e}")
             # Return a zero vector as fallback
             return [0.0] * self.embedding_dimension
+    
+    async def _aget_query_embedding(self, query: str) -> list:
+        """Async version of get_query_embedding."""
+        return self._get_query_embedding(query)
             
     def _get_text_embedding(self, text: str) -> list:
         """Get embedding for a text string."""
@@ -70,6 +74,10 @@ class CustomGeminiEmbedding(BaseEmbedding):
             logger.error(f"Error getting text embedding: {e}")
             # Return a zero vector as fallback
             return [0.0] * self.embedding_dimension
+    
+    async def _aget_text_embedding(self, text: str) -> list:
+        """Async version of get_text_embedding."""
+        return self._get_text_embedding(text)
             
     def _get_text_embeddings(self, texts: list) -> list:
         """Get embeddings for multiple text strings."""
@@ -77,6 +85,10 @@ class CustomGeminiEmbedding(BaseEmbedding):
         for text in texts:
             embeddings.append(self._get_text_embedding(text))
         return embeddings
+        
+    async def _aget_text_embeddings(self, texts: list) -> list:
+        """Async version of get_text_embeddings."""
+        return self._get_text_embeddings(texts)
 
 class PDFProcessor:
     """
