@@ -69,9 +69,16 @@ class CustomGeminiEmbedding(BaseEmbedding):
             result = genai.embed_content(
                 model=self.model_name,
                 content=query,
-                task_type="retrieval_query"
+                task_type="RETRIEVAL_QUERY"
             )
-            return result["embedding"]
+            # Extract the embedding from the response
+            if hasattr(result, 'embedding'):
+                return result.embedding
+            elif isinstance(result, dict) and 'embedding' in result:
+                return result['embedding']
+            else:
+                logger.error(f"Unexpected embedding response format: {result}")
+                return [0.0] * self.embedding_dimension
         except Exception as e:
             logger.error(f"Error getting query embedding: {e}")
             # Return a zero vector as fallback
@@ -87,9 +94,16 @@ class CustomGeminiEmbedding(BaseEmbedding):
             result = genai.embed_content(
                 model=self.model_name,
                 content=text,
-                task_type="retrieval_document"
+                task_type="RETRIEVAL_DOCUMENT"
             )
-            return result["embedding"]
+            # Extract the embedding from the response
+            if hasattr(result, 'embedding'):
+                return result.embedding
+            elif isinstance(result, dict) and 'embedding' in result:
+                return result['embedding']
+            else:
+                logger.error(f"Unexpected embedding response format: {result}")
+                return [0.0] * self.embedding_dimension
         except Exception as e:
             logger.error(f"Error getting text embedding: {e}")
             # Return a zero vector as fallback
@@ -205,7 +219,7 @@ class PDFProcessor:
         
         try:
             # Use Gemini directly for better responses
-            model = genai.GenerativeModel('gemini-1.5-pro')
+            model = genai.GenerativeModel('models/gemini-1.5-pro-001')
             
             # Create a context from the relevant chunks
             retriever = self.index.as_retriever(similarity_top_k=3)
