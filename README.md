@@ -38,6 +38,14 @@ A Python console application that processes PDF documents using Llama Index, Chr
      ```
      GOOGLE_API_KEY=your_api_key_here
      ```
+   - **IMPORTANT**: Make sure to use a valid API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
+   - The API key should have access to the following Gemini models:
+     - `models/embedding-001` (for embeddings)
+     - `models/gemini-pro` (for text generation)
+   - If you encounter API key errors, verify that:
+     - The key is correctly copied without any extra spaces
+     - The key is active and has not expired
+     - You have sufficient quota for the Gemini API
 
 ## Usage
 
@@ -107,6 +115,55 @@ Thank you for using the PDF Document Processor!
 ## License
 
 MIT
+
+## Troubleshooting
+
+### API Key Issues
+
+If you encounter errors related to the API key:
+
+1. **Invalid API Key Error**: 
+   - Verify that your API key is correctly copied into the `.env` file
+   - Make sure there are no extra spaces or characters
+   - Get a new API key from [Google AI Studio](https://aistudio.google.com/app/apikey) if needed
+
+2. **Environment Variable Not Found**:
+   - Check that the `.env` file exists in the project root directory
+   - Ensure the file contains the line `GOOGLE_API_KEY=your_api_key_here` with your actual API key
+   - Try setting the environment variable directly in your terminal:
+     ```bash
+     export GOOGLE_API_KEY=your_api_key_here
+     ```
+
+3. **Model Access Issues**:
+   - Ensure your API key has access to the required models
+   - Check your quota limits in the Google AI Studio dashboard
+
+### PDF Processing Issues
+
+1. **No PDF Files Found**:
+   - Verify that your PDF files are placed in the `Document` folder in the project root
+   - Check that the files have a `.pdf` extension
+
+2. **Error Processing PDFs**:
+   - Make sure the PDF files are not corrupted or password-protected
+   - Try with a simpler PDF file to test
+
+### ChromaDB Issues
+
+1. **ChromaDB Connection Errors**:
+   - Ensure that ChromaDB is properly installed
+   - Check for any firewall or permission issues
+
+### Running the Test Script
+
+To verify that your environment is set up correctly, run the test script:
+
+```bash
+python test_env.py
+```
+
+This will check if your API key is valid and can access the Gemini API.
 
 ## Contributing
 
