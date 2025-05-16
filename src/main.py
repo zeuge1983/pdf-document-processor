@@ -40,8 +40,8 @@ class CustomGeminiEmbedding(BaseEmbedding):
         super().__init__(model_name=model_name)
         self.api_key = api_key
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel(model_name)
         self.embed_model = genai.embed_content
+        self.embedding_dimension = 768  # Default embedding dimension for Gemini
         
     def _get_query_embedding(self, query: str) -> list:
         """Get embedding for a query string."""
@@ -54,7 +54,8 @@ class CustomGeminiEmbedding(BaseEmbedding):
             return result["embedding"]
         except Exception as e:
             logger.error(f"Error getting query embedding: {e}")
-            raise
+            # Return a zero vector as fallback
+            return [0.0] * self.embedding_dimension
             
     def _get_text_embedding(self, text: str) -> list:
         """Get embedding for a text string."""
@@ -67,7 +68,8 @@ class CustomGeminiEmbedding(BaseEmbedding):
             return result["embedding"]
         except Exception as e:
             logger.error(f"Error getting text embedding: {e}")
-            raise
+            # Return a zero vector as fallback
+            return [0.0] * self.embedding_dimension
             
     def _get_text_embeddings(self, texts: list) -> list:
         """Get embeddings for multiple text strings."""
