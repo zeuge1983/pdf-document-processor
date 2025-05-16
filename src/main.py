@@ -121,10 +121,15 @@ class PDFProcessor:
         logger.info("ChromaDB collection 'pdf_documents' initialized")
         
         # Initialize embedding model
-        self.embed_model = CustomGeminiEmbedding(
-            model_name="models/embedding-001",
-            api_key=self.api_key
-        )
+        try:
+            self.embed_model = CustomGeminiEmbedding(
+                model_name="models/embedding-001",
+                api_key=self.api_key
+            )
+            logger.info("Successfully initialized embedding model")
+        except Exception as e:
+            logger.error(f"Error initializing embedding model: {e}")
+            raise ValueError(f"Error: {e}\nPlease set the GOOGLE_API_KEY environment variable.")
         
         # Initialize vector store
         self.vector_store = ChromaVectorStore(chroma_collection=self.chroma_collection)
