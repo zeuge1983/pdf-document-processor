@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)
 class CustomGeminiEmbedding(BaseEmbedding):
     """Custom embedding class using Google's Generative AI API."""
     
-    def __init__(self, api_key=None, model_name="models/embedding-001"):
+    def __init__(self, api_key=None, model_name="models/text-embedding-004"):
         """Initialize with Google API key and model name."""
         super().__init__(model_name=model_name)
         # Use the provided API key or get it from environment
@@ -60,8 +60,8 @@ class CustomGeminiEmbedding(BaseEmbedding):
         
         # Configure the Gemini API
         genai.configure(api_key=api_key)
-        # Store the embedding function directly
-        self.embedding_dimension = 768  # Default embedding dimension for Gemini
+        # Store the embedding dimension
+        self.embedding_dimension = 768  # Default embedding dimension for Gemini text-embedding-004
         
     def _get_query_embedding(self, query: str) -> list:
         """Get embedding for a query string."""
@@ -137,7 +137,7 @@ class PDFProcessor:
             
             # Initialize embedding model
             self.embed_model = CustomGeminiEmbedding(
-                model_name="models/embedding-001",
+                model_name="models/text-embedding-004",
                 api_key=self.api_key
             )
             logger.info("Successfully initialized embedding model")
