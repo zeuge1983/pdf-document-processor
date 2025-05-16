@@ -6,6 +6,20 @@ Run script for the PDF Document Processor
 import os
 import sys
 import subprocess
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+if os.path.exists(env_file):
+    load_dotenv(env_file)
+    print(f"Loaded environment variables from {env_file}")
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if api_key:
+        print(f"API key loaded: {api_key[:5]}...{api_key[-4:]}")
+    else:
+        print("API key not found in .env file")
+else:
+    print(f".env file not found at {env_file}")
 
 def main():
     """Run the PDF Document Processor."""
@@ -28,7 +42,9 @@ def main():
     
     # Run main.py
     try:
-        subprocess.run([sys.executable, main_py], check=True)
+        # Pass the current environment variables to the subprocess
+        env = os.environ.copy()
+        subprocess.run([sys.executable, main_py], check=True, env=env)
     except subprocess.CalledProcessError as e:
         print(f"Error running {main_py}: {str(e)}")
         sys.exit(1)
