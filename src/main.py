@@ -14,11 +14,15 @@ from llama_index.core import SimpleDirectoryReader
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.vector_stores.chroma import ChromaVectorStore
 from llama_index.core.storage.storage_context import StorageContext
-from llama_index.embeddings.gemini import GeminiEmbedding
 from llama_index.core import VectorStoreIndex
+from llama_index.core.embeddings import BaseEmbedding
 import chromadb
+import numpy as np
+from typing import List, Optional
 
 from utils import check_environment, display_header, display_message, get_user_input
+
+
 
 # Configure logging
 logging.basicConfig(
@@ -27,6 +31,50 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()]
 )
 logger = logging.getLogger(__name__)
+
+class CustomGeminiEmbedding(BaseEmbedding):
+    """Custom embedding class using Google's Generative AI API."""
+    
+    def __init__(self, api_key, model_name="models/embedding-001"):
+        """Initialize with Google API key and model name."""
+        super().__init__(model_name=model_name)
+        self.api_key = api_key
+        genai.configure(api_key=api_key)
+        self.model = genai.GenerativeModel(model_name)
+        self.embed_model = genai.embed_content
+        
+    def _get_query_embedding(self, query: str) -> list:
+        """Get embedding for a query string."""
+        try:
+            result = self.embed_model(
+                model=self.model_name,
+                content=query,
+                task_type="retrieval_query"
+            )
+            return result["embedding"]
+        except Exception as e:
+            logger.error(f"Error getting query embedding: {e}")
+            raise
+            
+    def _get_text_embedding(self, text: str) -> list:
+        """Get embedding for a text string."""
+        try:
+            result = self.embed_model(
+                model=self.model_name,
+                content=text,
+                task_type="retrieval_document"
+            )
+            return result["embedding"]
+        except Exception as e:
+            logger.error(f"Error getting text embedding: {e}")
+            raise
+            
+    def _get_text_embeddings(self, texts: list) -> list:
+        """Get embeddings for multiple text strings."""
+        embeddings = []
+        for text in texts:
+            embeddings.append(self._get_text_embedding(text))
+        return embeddings
 
 class PDFProcessor:
     """
@@ -53,7 +101,7 @@ class PDFProcessor:
         logger.info("ChromaDB collection 'pdf_documents' initialized")
         
         # Initialize embedding model
-        self.embed_model = GeminiEmbedding(
+        self.embed_model = CustomGeminiEmbedding(
             model_name="models/embedding-001",
             api_key=self.api_key
         )
