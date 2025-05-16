@@ -35,6 +35,11 @@ def main():
         )
         print(f"Embedding model test successful!")
         print(f"Embedding dimension: {len(result.embedding)}")
+        
+        # Test embedding dimension
+        if len(result.embedding) != 768:
+            print(f"WARNING: Expected embedding dimension to be 768, but got {len(result.embedding)}")
+            print("You may need to update the embedding_dimension in CustomGeminiEmbedding class")
     except Exception as e:
         print(f"Error testing embedding model: {e}")
     
