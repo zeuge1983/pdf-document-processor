@@ -49,6 +49,9 @@ logger = logging.getLogger(__name__)
 class CustomGeminiEmbedding(BaseEmbedding):
     """Custom embedding class using Google's Generative AI API."""
     
+    # Define class variable for embedding dimension
+    embedding_dimension: int = 768  # Default embedding dimension for Gemini text-embedding-004
+    
     def __init__(self, api_key=None, model_name="models/text-embedding-004"):
         """Initialize with Google API key and model name."""
         super().__init__(model_name=model_name)
@@ -60,8 +63,14 @@ class CustomGeminiEmbedding(BaseEmbedding):
         
         # Configure the Gemini API
         genai.configure(api_key=api_key)
-        # Store the embedding dimension
-        self.embedding_dimension = 768  # Default embedding dimension for Gemini text-embedding-004
+        
+        # Ensure embedding_dimension is set
+        self.__class__.embedding_dimension = 768
+        
+    @property
+    def dimension(self) -> int:
+        """Return the embedding dimension."""
+        return self.__class__.embedding_dimension
         
     def _get_query_embedding(self, query: str) -> list:
         """Get embedding for a query string."""
