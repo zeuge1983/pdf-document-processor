@@ -14,7 +14,7 @@ from llama_index.core import SimpleDirectoryReader
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.vector_stores.chroma import ChromaVectorStore
 from llama_index.core.storage.storage_context import StorageContext
-from llama_index.core.embeddings import GoogleGenerativeAIEmbedding
+from llama_index.embeddings.google import GoogleGenerativeAIEmbedding
 from llama_index.core import VectorStoreIndex
 import chromadb
 
