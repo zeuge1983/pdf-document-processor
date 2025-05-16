@@ -9,6 +9,7 @@ It allows users to upload PDFs and ask questions about the content through a cha
 import os
 import sys
 import logging
+from dotenv import load_dotenv
 import google.generativeai as genai
 from llama_index.core import SimpleDirectoryReader
 from llama_index.core.node_parser import SentenceSplitter
@@ -18,6 +19,19 @@ from llama_index.core import VectorStoreIndex
 from llama_index.core.embeddings import BaseEmbedding
 import chromadb
 import numpy as np
+
+# Load environment variables from .env file
+env_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+if os.path.exists(env_file):
+    load_dotenv(env_file)
+    print(f"Loaded environment variables from {env_file}")
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if api_key:
+        print(f"API key loaded: {api_key[:5]}...{api_key[-4:]}")
+    else:
+        print("API key not found in .env file")
+else:
+    print(f".env file not found at {env_file}")
 from typing import List, Optional
 
 from utils import check_environment, display_header, display_message, get_user_input
@@ -46,13 +60,13 @@ class CustomGeminiEmbedding(BaseEmbedding):
         
         # Configure the Gemini API
         genai.configure(api_key=api_key)
-        self.embed_model = genai.embed_content
+        # Store the embedding function directly
         self.embedding_dimension = 768  # Default embedding dimension for Gemini
         
     def _get_query_embedding(self, query: str) -> list:
         """Get embedding for a query string."""
         try:
-            result = self.embed_model(
+            result = genai.embed_content(
                 model=self.model_name,
                 content=query,
                 task_type="retrieval_query"
@@ -70,7 +84,7 @@ class CustomGeminiEmbedding(BaseEmbedding):
     def _get_text_embedding(self, text: str) -> list:
         """Get embedding for a text string."""
         try:
-            result = self.embed_model(
+            result = genai.embed_content(
                 model=self.model_name,
                 content=text,
                 task_type="retrieval_document"
@@ -111,25 +125,28 @@ class PDFProcessor:
         # Initialize Gemini API
         genai.configure(api_key=self.api_key)
         
-        # Log available models
-        models = [m.name for m in genai.list_models()]
-        logger.info(f"Available models: {models}")
-        
-        # Initialize ChromaDB
-        self.chroma_client = chromadb.Client()
-        self.chroma_collection = self.chroma_client.get_or_create_collection("pdf_documents")
-        logger.info("ChromaDB collection 'pdf_documents' initialized")
-        
-        # Initialize embedding model
         try:
+            # Log available models
+            models = [m.name for m in genai.list_models()]
+            logger.info(f"Available models: {models}")
+            
+            # Initialize ChromaDB
+            self.chroma_client = chromadb.Client()
+            self.chroma_collection = self.chroma_client.get_or_create_collection("pdf_documents")
+            logger.info("ChromaDB collection 'pdf_documents' initialized")
+            
+            # Initialize embedding model
             self.embed_model = CustomGeminiEmbedding(
                 model_name="models/embedding-001",
                 api_key=self.api_key
             )
             logger.info("Successfully initialized embedding model")
         except Exception as e:
-            logger.error(f"Error initializing embedding model: {e}")
-            raise ValueError(f"Error: {e}\nPlease set the GOOGLE_API_KEY environment variable.")
+            logger.error(f"Error during initialization: {e}")
+            print(f"Error: {e}")
+            print("Please check your GOOGLE_API_KEY environment variable.")
+            print("Make sure the API key is valid and has access to the Gemini API.")
+            raise ValueError(f"Initialization failed: {e}")
         
         # Initialize vector store
         self.vector_store = ChromaVectorStore(chroma_collection=self.chroma_collection)
