@@ -35,10 +35,16 @@ logger = logging.getLogger(__name__)
 class CustomGeminiEmbedding(BaseEmbedding):
     """Custom embedding class using Google's Generative AI API."""
     
-    def __init__(self, api_key, model_name="models/embedding-001"):
+    def __init__(self, api_key=None, model_name="models/embedding-001"):
         """Initialize with Google API key and model name."""
         super().__init__(model_name=model_name)
-        self.api_key = api_key
+        # Use the provided API key or get it from environment
+        if api_key is None:
+            api_key = os.getenv("GOOGLE_API_KEY")
+            if not api_key:
+                raise ValueError("GOOGLE_API_KEY environment variable not set")
+        
+        # Configure the Gemini API
         genai.configure(api_key=api_key)
         self.embed_model = genai.embed_content
         self.embedding_dimension = 768  # Default embedding dimension for Gemini
